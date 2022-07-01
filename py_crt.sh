@@ -103,11 +103,18 @@ elif [ $py_name == "-s" ] || [ $py_name == "-start" ] ; then
 Sample Python program
 ========================
 
+#--- import 
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
+import io, os, sys, types
+
+# import my jupynote notebook file as a module
+import nb_finder as nbf
+sys.meta_path.append(nbf.NotebookFinder())
+import yhc_module as yhc
 
 #--- read data
 datapath = ""
