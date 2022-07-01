@@ -90,8 +90,49 @@ if [ $py_name == "-h" ] || [ $py_name == "-help" ] ; then
   #cat $bash_usage || exit 1
   exit 0
 
-elif [ $py_name == "-func" ]; then
-  #cat $bash_func || exit 1
+elif [ $py_name == "-f" ] || [ $py_name == "-func" ]; then
+
+  date00=`date +%Y/%m/%d`
+
+  #--- wrtie sample python file
+  cat > $ftemp01 << EOF
+
+========================
+ Sample my Python function
+========================
+
+def :
+    """
+    ----------------------
+    Description: 
+    
+
+    Input arguments:
+
+
+    Return:
+
+
+    Example:
+
+      
+    Date created: $date00
+    ----------------------
+    """
+
+    func_name = ""
+
+    #--- 
+
+    return
+
+EOF
+
+
+  #--- print out on screen
+  cat $ftemp01
+  rm $ftemp01
+
   exit 0
 
 elif [ $py_name == "-s" ] || [ $py_name == "-start" ] ; then
@@ -100,7 +141,7 @@ elif [ $py_name == "-s" ] || [ $py_name == "-start" ] ; then
   cat > $ftemp01 << EOF
 
 ========================
-Sample Python program
+ Sample Python program
 ========================
 
 #--- import 
