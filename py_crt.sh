@@ -41,7 +41,7 @@ ftemp01="$ftemp.temp01"
 # get total number of parameters
 # set meaingful indexes in command line 
 pram_num=$#
-pram_idx=(-c -case -d -dir -s -start -a -add -f -file)
+pram_idx=(-c -case -d -dir -s -start -a -add -f -func)
 
 ## res_available=(cn xy)
 pram_idx_num=${#pram_idx[@]}
@@ -152,9 +152,6 @@ import numpy as np
 import xarray as xr
 import io, os, sys, types
 
-# import my jupynote notebook file as a module
-import nb_finder as nbf
-sys.meta_path.append(nbf.NotebookFinder())
 import yhc_module as yhc
 
 #--- read data
@@ -175,6 +172,14 @@ EOF
   exit 0
 
 fi
+
+##############
+# deleted
+# # import my jupynote notebook file as a module
+#import nb_finder as nbf
+#sys.meta_path.append(nbf.NotebookFinder())
+#
+##############
 
 # do not allow script name started with "-" because it is hard to delete, e.g -r.bash
 if [ ${py_name:0:1} == "-" ]; then
