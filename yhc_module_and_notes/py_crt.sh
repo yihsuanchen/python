@@ -114,8 +114,9 @@ def :
 
 
     Example:
-
-      
+      import yhc_module as yhc
+       = yhc.()
+     
     Date created: $date00
     ----------------------
     """
