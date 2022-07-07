@@ -155,6 +155,8 @@ import io, os, sys, types
 
 import yhc_module as yhc
 
+xr.set_options(keep_attrs=True)  # keep attributes after xarray operation
+
 #--- read data
 datapath = ""
 filename = ""
