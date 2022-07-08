@@ -27,7 +27,8 @@ cases=(
       )
        #newcase
 
-usage="(-c OR -case ${cases[@]}) (-d OR -dir dir1) (-f OR -file file1) (-h OR -help) (-a OR -add file1.sh case_name) (-func) ooo.sh"
+#usage="(-c OR -case ${cases[@]}) (-d OR -dir dir1) (-f OR -file file1) (-h OR -help) (-a OR -add file1.sh case_name) (-func) ooo.sh"
+usage="(-s|-start) (-f|-func) (-exe) ooo.sh"
 
 #=================
 #  program start
@@ -41,7 +42,7 @@ ftemp01="$ftemp.temp01"
 # get total number of parameters
 # set meaingful indexes in command line 
 pram_num=$#
-pram_idx=(-c -case -d -dir -s -start -a -add -f -func)
+pram_idx=(-c -case -d -dir -s -start -a -add -f -func -exe)  # for some reason, -e doesn't work
 
 ## res_available=(cn xy)
 pram_idx_num=${#pram_idx[@]}
@@ -88,6 +89,48 @@ py_name=${pram[$pram_num]}
 
 if [ $py_name == "-h" ] || [ $py_name == "-help" ] ; then
   #cat $bash_usage || exit 1
+  exit 0
+
+#--- convert yhc_module.ipynb to yhc_module.py, and copy .py file to a folder that can be imported
+elif [ $py_name == "-exe" ]; then
+  
+  machine="Mac"
+
+  #--- deterimine machine
+  if [ $machine == "Mac" ]; then
+    py_source_dir=`pwd`
+    yhc_module_ipynb="$py_source_dir/yhc_module.ipynb"
+    yhc_module_py="$py_source_dir/yhc_module.py"
+    py_targe_dir="/Users/yihsuan/.ipython"
+  else
+    echo "ERROR: [$machine] is not supported. STOP"
+    exit 1
+  fi  
+
+  #--- commands
+  cmd1="jupyter nbconvert $yhc_module_ipynb --to python && Done. create yhc_module.py || exit 3"
+  cmd2="cp -i $yhc_module_py $py_targe_dir && echo"
+
+  #--- check with the user
+  echo "-------------"
+  echo ""
+  echo "Convert yhc_module.ipynb to yhc_module.py, and copy .py file to [${py_targe_dir}]"
+  echo "  Machine      : [$machine]"
+  echo "  Source ipynb : [$yhc_module_ipynb]"
+  echo "  Target folder: [${py_targe_dir}]"
+  echo ""
+  read -p "Is it correct? (y/n) " choice
+
+  if [ $choice -a $choice == "y" ]; then
+    jupyter nbconvert $yhc_module_ipynb --to python && echo "Done. create yhc_module.py" || exit 3
+    cp -i $yhc_module_py $py_targe_dir && echo "Done. copy yhc_module.py" || exit 5
+    echo "ls -l $py_targe_dir/yhc_module.py"
+
+  else
+    echo "program stop"
+    exit 1
+  fi
+
   exit 0
 
 elif [ $py_name == "-f" ] || [ $py_name == "-func" ]; then
