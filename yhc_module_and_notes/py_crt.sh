@@ -95,6 +95,7 @@ if [ $py_name == "-h" ] || [ $py_name == "-help" ] ; then
 elif [ $py_name == "-exe" ]; then
   
   machine="Mac"
+  #machine="analysis"
 
   #--- deterimine machine
   if [ $machine == "Mac" ]; then
@@ -102,6 +103,13 @@ elif [ $py_name == "-exe" ]; then
     yhc_module_ipynb="$py_source_dir/yhc_module.ipynb"
     yhc_module_py="$py_source_dir/yhc_module.py"
     py_targe_dir="/Users/yihsuan/.ipython"
+
+  elif [ $machine == "analysis" ]; then
+    py_source_dir=`pwd`
+    yhc_module_ipynb="$py_source_dir/yhc_module.ipynb"
+    yhc_module_py="$py_source_dir/yhc_module.py"
+    py_targe_dir="$py_source_dir"
+
   else
     echo "ERROR: [$machine] is not supported. STOP"
     exit 1
