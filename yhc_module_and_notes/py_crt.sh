@@ -23,12 +23,18 @@ homepath="/ncrc/home2/Yi-hsuan.Chen/"
 homepath_work="$homepath/script/shell/application/create/"
 
 cases=(
-      test_case1
-      )
+      "test_case1"
+      "plot-scm-xy"
+      ) 
        #newcase
 
+cases_notes=(
+      "test_case1 : a test case"
+      "plot-scm-xy: read SCM files and plot XY profiles"
+            )
+
 #usage="(-c OR -case ${cases[@]}) (-d OR -dir dir1) (-f OR -file file1) (-h OR -help) (-a OR -add file1.sh case_name) (-func) ooo.sh"
-usage="(-s|-start) (-f|-func) (-exe) ooo.sh"
+usage="(-c OR -case ${cases[@]}) (-s|-start) (-f|-func) (-exe) (-a OR -add file1.sh case_name) ooo.sh"
 
 #=================
 #  program start
@@ -197,8 +203,8 @@ elif [ $py_name == "-s" ] || [ $py_name == "-start" ] ; then
 ========================
 
 #--- import 
-import cartopy.crs as ccrs
-import cartopy.feature as cfeature
+#import cartopy.crs as ccrs
+#import cartopy.feature as cfeature
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
@@ -356,26 +362,19 @@ elif [ \$casename_work -a \$casename_work == "$sample_case" ]; then
 
 #*** case: "$sample_case" start ***
 elif [ \$casename_work -a \$casename_work == "$sample_case" ]; then
-cat >> \$py_name << EOF
-
-#**********************
-#  Description:
-#
-#**********************
-
 EOF11
 
   # create template file
   cat $sample_file >> $ftemp02
 
   # replace '\' to '\\'
-  sed -i 's,\\,\\\\,g' $ftemp02 || exit 3
+  #sed -i 's,\\,\\\\,g' $ftemp02 || exit 3
 
   # replace '`' to '\`'
-  sed -i "s/\`/\\\\\`/g" $ftemp02 || exit 3
+  #sed -i "s/\`/\\\\\`/g" $ftemp02 || exit 3
 
   # replace '$' to '\$'
-  sed -i 's,\$,\\\$,g' $ftemp02 || exit 3
+  #sed -i 's,\$,\\\$,g' $ftemp02 || exit 3
 
   # remove work files
   cat $ftemp02 >> $ftemp01  || exit 5
@@ -431,11 +430,13 @@ if [ ! $casename_work ]; then
   echo "available case names :"
     for ((i=0; i<$num_case; i=i+1))
     do
-      echo "                       $(($i+1)), ${cases[$i]}"    
+      echo "                       $(($i+1)), ${cases_notes[$i]}"    
     done
-  echo "set to default setup"
-  casename_work="default"
+
   echo ""
+  exit 1
+  #echo "set to default setup"
+  #casename_work="default"
 fi
 
 #*** check case == "list-files-dir" ***
@@ -464,14 +465,6 @@ fi
 # script start
 #***************
 
-cat > $py_name << EOF
-import cartopy.crs as ccrs
-import cartopy.feature as cfeature
-import matplotlib.pyplot as plt
-import numpy as np
-import xarray as xr
-EOF
-
 #*************
 # script case
 #*************
@@ -479,6 +472,11 @@ EOF
 #*** case "default" start ***
 if [ $casename_work -a $casename_work == "default" ]; then
 cat >> $py_name << EOF || exit 1
+#import cartopy.crs as ccrs
+#import cartopy.feature as cfeature
+import matplotlib.pyplot as plt
+import numpy as np
+import xarray as xr
 
 datapath = ""
 filename = ""
@@ -490,6 +488,195 @@ files_input = datapath+"/"+filename
 
 EOF
 #*** case "default" end ***
+
+#*** case: "plot-scm-xy" start ***
+elif [ $casename_work -a $casename_work == "plot-scm-xy" ]; then
+cat >> $py_name << EOF || exit 1
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "b3707dae",
+   "metadata": {},
+   "source": [
+    "# Program - plot XY profiles in SCM\n",
+    "\n",
+    "**Content:**\n",
+    "\n",
+    "- Open and Read a SCM netCDF file\n",
+    "- Open and Read other dataset\n",
+    "- Plot XY profile\n",
+    "\n",
+    "**Author**: Yi-Hsuan Chen (yihsuan@umich.edu)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "1bb2aed2",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import matplotlib.pyplot as plt\n",
+    "import numpy as np\n",
+    "import xarray as xr\n",
+    "import io, os, sys, types\n",
+    "\n",
+    "import yhc_module as yhc\n",
+    "\n",
+    "xr.set_options(keep_attrs=True)  # keep attributes after xarray operation"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c98ba131",
+   "metadata": {},
+   "source": [
+    "## Open SCM file\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b227e675",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#--- open SCM file\n",
+    "datapath = \"\"\n",
+    "filename_scm = \"\"\n",
+    "file_scm = datapath+\"/\"+filename_scm\n",
+    "\n",
+    "da_scm = xr.open_dataset(file_scm)\n",
+    "da_scm"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3a2f99be",
+   "metadata": {},
+   "source": [
+    "## Open other dataset\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "dc6e3b90",
+   "metadata": {},
+   "source": [
+    "#--- open SCM file\n",
+    "datapath = \"~/Desktop/CGILS_forcing\"\n",
+    "filename_cgils = \"ctl_s12.nc\"\n",
+    "file_cgils = datapath+\"/\"+filename_cgils\n",
+    "\n",
+    "da_cgils = xr.open_dataset(file_cgils)\n",
+    "da_cgils"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9311452d",
+   "metadata": {},
+   "source": [
+    "## Plot XY profiles"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "efadc4b4",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#==============================\n",
+    "def ax_def_xy (ax, var):\n",
+    "\n",
+    "    #--- set grids\n",
+    "    ax.grid(True)\n",
+    "    ax.minorticks_on()\n",
+    "    \n",
+    "    #--- inverse axes\n",
+    "    ax.invert_yaxis()\n",
+    "    \n",
+    "    #--- legend\n",
+    "    ax.legend([\"SCM\"])\n",
+    "    \n",
+    "    #--- set x or y labels\n",
+    "    ax.set_ylabel(\"Pressure (hPa)\")\n",
+    "\n",
+    "    #--- set title\n",
+    "    ax.set_title(var.attrs['long_name'], loc='left')\n",
+    "    ax.set_title(var.attrs['units'], loc='right')\n",
+    "    ax.set_xlabel(var.attrs['long_name']+\" (\"+var.attrs['units']+\")\")\n",
+    "#============================== \n",
+    "\n",
+    "do_plot=True\n",
+    "\n",
+    "if (do_plot):\n",
+    "    fig, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(18, 6))\n",
+    "\n",
+    "    #--- setting\n",
+    "    tt = 3000   # time step\n",
+    "    fig.suptitle(\"SCM, time step=\"+str(tt))\n",
+    "\n",
+    "    #--- ax1\n",
+    "    var1_scm = da_scm.vcomp[tt,:,0,0]\n",
+    "    yy_scm  = da_scm.pfull_tv[tt,:,0,0]\n",
+    "\n",
+    "    ax1.plot(var1_scm, yy_scm, 'r-o',\n",
+    "             da_cgils.v[0,:,0,0], da_cgils.lev[:],'b^'\n",
+    "            )\n",
+    "    ax_def_xy(ax1, var1_scm)\n",
+    "\n",
+    "#print(da_scm.time)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "2d7a2ae2",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "a4200008",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.8"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
+EOF
+#*** case: plot-scm-xy end ***
+
+# newcase
+
+fi  # end if of casename_work
 
 #**********************************
 # check whether sh_name is created
