@@ -495,6 +495,7 @@ EOF
 
 #*** case: "plot-scm-xy" start ***
 elif [ $casename_work -a $casename_work == "plot-scm-xy" ]; then
+
 cat >> $py_name << EOF || exit 1
 {
  "cells": [
@@ -547,12 +548,26 @@ cat >> $py_name << EOF || exit 1
    "outputs": [],
    "source": [
     "#--- open SCM file\n",
-    "datapath = \"\"\n",
-    "filename_scm = \"\"\n",
-    "file_scm = datapath+\"/\"+filename_scm\n",
+    "datapath = \"../data.scm.edmf_mynn/\"\n",
     "\n",
-    "da_scm = xr.open_dataset(file_scm)\n",
-    "da_scm"
+    "#--- single file\n",
+    "#filename_scm = \"\"\n",
+    "#file_scm = datapath+\"/\"+filename_scm\n",
+    "\n",
+    "#--- multiple files\n",
+    "filenames_scm = [\n",
+    "             \"SCM_am4_xanadu_edmf_mynn.v01_RF01-00cd-am4p0_aerT_clr_am4RAD_sw.1x0m5d_1x1a.atmos_edmf_mynn.nc\", \n",
+    "             \"SCM_am4_xanadu_edmf_mynn.v01_RF01-00cd-am4p0_aerT_clr_am4RAD_sw_FMRA.1x0m5d_1x1a.atmos_edmf_mynn.nc\", \n",
+    "             \"SCM_am4_xanadu_edmf_mynn.v01_RF01-00cd-am4p0_aerT_clr_am4RAD_sw_FMRACg_FT0.1x0m5d_1x1a.atmos_edmf_mynn.nc\", \n",
+    "             \"SCM_am4_xanadu_edmf_mynn.v01_RF01-00cd-am4p0_aerT_clr_am4RAD_sw_FMRACg_FTMRA.1x0m5d_1x1a.atmos_edmf_mynn.nc\"\n",
+    "                ]\n",
+    "filenames_scm = [datapath+file1 for file1 in filenames_scm]\n",
+    "\n",
+    "#--- open data using xarray\n",
+    "da_set1 = xr.open_dataset(filenames_scm[0])\n",
+    "da_set2 = xr.open_dataset(filenames_scm[1])\n",
+    "da_set3 = xr.open_dataset(filenames_scm[2])\n",
+    "da_set4 = xr.open_dataset(filenames_scm[3])\n"
    ]
   },
   {
@@ -587,13 +602,22 @@ cat >> $py_name << EOF || exit 1
    ]
   },
   {
+   "cell_type": "markdown",
+   "id": "8012006d",
+   "metadata": {},
+   "source": [
+    "### set shared plot features"
+   ]
+  },
+  {
    "cell_type": "code",
    "execution_count": null,
-   "id": "efadc4b4",
+   "id": "03ac7835-46ac-4665-851c-b26c65b1244f",
    "metadata": {},
    "outputs": [],
    "source": [
-    "#==============================\n",
+    "#--- set shared feature\n",
+    "\n",
     "def ax_def_xy (ax, var):\n",
     "\n",
     "    #--- set grids\n",
@@ -609,45 +633,86 @@ cat >> $py_name << EOF || exit 1
     "    #--- set x or y labels\n",
     "    ax.set_ylabel(\"Pressure (hPa)\")\n",
     "\n",
+    "    #--- set X and Y axis range  \n",
+    "    #ax.set_xlim([xmin, xmax])\n",
+    "    #ax.set_ylim([1020., 500.])\n",
+    "    \n",
     "    #--- set title\n",
     "    ax.set_title(var.attrs['long_name'], loc='left')\n",
     "    ax.set_title(var.attrs['units'], loc='right')\n",
-    "    ax.set_xlabel(var.attrs['long_name']+\" (\"+var.attrs['units']+\")\")\n",
-    "#============================== \n",
-    "\n",
-    "do_plot=True\n",
-    "\n",
-    "if (do_plot):\n",
-    "    fig, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(18, 6))\n",
-    "\n",
-    "    #--- setting\n",
-    "    tt = 3000   # time step\n",
-    "    fig.suptitle(\"SCM, time step=\"+str(tt))\n",
-    "\n",
-    "    #--- ax1\n",
-    "    var1_scm = da_scm.vcomp[tt,:,0,0]\n",
-    "    yy_scm  = da_scm.pfull_tv[tt,:,0,0]\n",
-    "\n",
-    "    ax1.plot(var1_scm, yy_scm, 'r-o',\n",
-    "             da_cgils.v[0,:,0,0], da_cgils.lev[:],'b^'\n",
-    "            )\n",
-    "    ax_def_xy(ax1, var1_scm)\n",
-    "\n",
-    "#print(da_scm.time)"
+    "    ax.set_xlabel(var.attrs['long_name']+\" (\"+var.attrs['units']+\")\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "32961ea5",
+   "metadata": {},
+   "source": [
+    "### Plot 1 - "
    ]
   },
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "2d7a2ae2",
+   "id": "075ff405-e4cc-4b6b-a75b-f6fed39e3758",
    "metadata": {},
    "outputs": [],
-   "source": []
+   "source": [
+    "tt = 0   # time step\n",
+    "\n",
+    "fig, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(18, 6))\n",
+    "fig.suptitle(\"SCM, time step=\"+str(tt))\n",
+    "fig.tight_layout()\n",
+    "\n",
+    "#--- line style\n",
+    "style_1a = 'r-'; style_1b = 'r--'; style_1c = 'r:'\n",
+    "style_2a = 'b-'; style_2b = 'b--'; style_2c = 'b:'\n",
+    "style_3a = 'y-'; style_3b = 'y--'; style_3c = 'y:'\n",
+    "style_4a = 'c-'; style_4b = 'c--'; style_4c = 'c:'\n",
+    "\n",
+    "#--- subplot 1\n",
+    "ax1.plot(\n",
+    "    da_set1.omega[tt,:,0,0]*864., da_set1.pfull_tv[tt,:,0,0]/100., style_1,\n",
+    "    da_set2.omega[tt,:,0,0]*864., da_set2.pfull_tv[tt,:,0,0]/100., style_2,\n",
+    "    #da_merraCG_FT0.omega[tt,:,0,0], da_merraCG_FT0.pfull_tv[tt,:,0,0]/100., style_3,\n",
+    "        )\n",
+    "var_dum = da_set1.omega.copy()\n",
+    "var_dum.attrs['units']=\"hPa/day\"\n",
+    "ax_def_xy(ax1, var_dum)\n",
+    "ax1.legend([\"SCM\",\"MERRA2\"])\n",
+    "\n",
+    "\n",
+    "#--- subplot 2\n",
+    "ax2.plot(\n",
+    "    da_set1.temp[tt,:,0,0], da_set1.pfull_tv[tt,:,0,0]/100., style_1,\n",
+    "    #da_set2.temp[tt,:,0,0], da_set2.pfull_tv[tt,:,0,0]/100., style_2,\n",
+    "    #da_merraCG_FT0.temp[tt,:,0,0], da_merraCG_FT0.pfull_tv[tt,:,0,0]/100., style_3,\n",
+    "        )\n",
+    "ax_def_xy(ax2, da_set1.temp[tt,:,0,0])\n",
+    "\n",
+    "#--- subplot 3\n",
+    "ax3.plot(\n",
+    "    da_set1.sphum[tt,:,0,0]*1000., da_set1.pfull_tv[tt,:,0,0]/100., style_1,\n",
+    "    #da_set2.temp[tt,:,0,0], da_set2.pfull_tv[tt,:,0,0]/100., style_2,\n",
+    "    #da_merraCG_FT0.temp[tt,:,0,0], da_merraCG_FT0.pfull_tv[tt,:,0,0]/100., style_3,\n",
+    "        )\n",
+    "var_dum = da_set1.sphum.copy()\n",
+    "var_dum.attrs['units']=\"g/kg\"\n",
+    "ax_def_xy(ax3, var_dum)\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c4c32392",
+   "metadata": {},
+   "source": [
+    "### Plot 2 - "
+   ]
   },
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "a4200008",
+   "id": "0e72a861",
    "metadata": {},
    "outputs": [],
    "source": []
