@@ -23,16 +23,18 @@ homepath="/ncrc/home2/Yi-hsuan.Chen/"
 homepath_work="$homepath/script/shell/application/create/"
 
 cases=(
-      "test_case1"
-      "plot-scm-xy"
       "MERRA2_interp2scm"
+      "plot-scm-xy_profile"
+      "plot-scm-xy_series"
+      "test_case1"
       ) 
        #newcase
 
 cases_notes=(
-      "MERRA2_interp2scm: interpolate MERRA-2 data on GFDL SCM levels"
-      "test_case1 	: a test case"
-      "plot-scm-xy	: read SCM files and plot XY profiles"
+      "MERRA2_interp2scm	: interpolate MERRA-2 data on GFDL SCM levels"
+      "plot-scm-xy_profile	: read SCM files and plot XY profiles"
+      "plot-scm-xy_series	: read SCM files and plot XY time series"
+      "test_case1 		: a test case"
             )
 
 #usage="(-c OR -case ${cases[@]}) (-d OR -dir dir1) (-f OR -file file1) (-h OR -help) (-a OR -add file1.sh case_name) (-func) ooo.sh"
@@ -97,6 +99,7 @@ py_name=${pram[$pram_num]}
 
 if [ $py_name == "-h" ] || [ $py_name == "-help" ] ; then
   #cat $bash_usage || exit 1
+  echo $usage || exit 1
   exit 0
 
 #--- convert yhc_module.ipynb to yhc_module.py, and copy .py file to a folder that can be imported
@@ -492,256 +495,6 @@ files_input = datapath+"/"+filename
 
 EOF
 #*** case "default" end ***
-
-#*** case: "plot-scm-xy" start ***
-elif [ $casename_work -a $casename_work == "plot-scm-xy" ]; then
-
-cat >> $py_name << EOF || exit 1
-{
- "cells": [
-  {
-   "cell_type": "markdown",
-   "id": "b3707dae",
-   "metadata": {},
-   "source": [
-    "# Program - plot XY profiles in SCM\n",
-    "\n",
-    "**Content:**\n",
-    "\n",
-    "- Open and Read a SCM netCDF file\n",
-    "- Open and Read other dataset\n",
-    "- Plot XY profile\n",
-    "\n",
-    "**Author**: Yi-Hsuan Chen (yihsuan@umich.edu)"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "1bb2aed2",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "import matplotlib.pyplot as plt\n",
-    "import numpy as np\n",
-    "import xarray as xr\n",
-    "import io, os, sys, types\n",
-    "\n",
-    "import yhc_module as yhc\n",
-    "\n",
-    "xr.set_options(keep_attrs=True)  # keep attributes after xarray operation"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "c98ba131",
-   "metadata": {},
-   "source": [
-    "## Open SCM file\n"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "b227e675",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "#--- open SCM file\n",
-    "datapath = \"../data.scm.edmf_mynn/\"\n",
-    "\n",
-    "#--- single file\n",
-    "#filename_scm = \"\"\n",
-    "#file_scm = datapath+\"/\"+filename_scm\n",
-    "\n",
-    "#--- multiple files\n",
-    "filenames_scm = [\n",
-    "             \"SCM_am4_xanadu_edmf_mynn.v01_RF01-00cd-am4p0_aerT_clr_am4RAD_sw.1x0m5d_1x1a.atmos_edmf_mynn.nc\", \n",
-    "             \"SCM_am4_xanadu_edmf_mynn.v01_RF01-00cd-am4p0_aerT_clr_am4RAD_sw_FMRA.1x0m5d_1x1a.atmos_edmf_mynn.nc\", \n",
-    "             \"SCM_am4_xanadu_edmf_mynn.v01_RF01-00cd-am4p0_aerT_clr_am4RAD_sw_FMRACg_FT0.1x0m5d_1x1a.atmos_edmf_mynn.nc\", \n",
-    "             \"SCM_am4_xanadu_edmf_mynn.v01_RF01-00cd-am4p0_aerT_clr_am4RAD_sw_FMRACg_FTMRA.1x0m5d_1x1a.atmos_edmf_mynn.nc\"\n",
-    "                ]\n",
-    "filenames_scm = [datapath+file1 for file1 in filenames_scm]\n",
-    "\n",
-    "#--- open data using xarray\n",
-    "da_set1 = xr.open_dataset(filenames_scm[0])\n",
-    "da_set2 = xr.open_dataset(filenames_scm[1])\n",
-    "da_set3 = xr.open_dataset(filenames_scm[2])\n",
-    "da_set4 = xr.open_dataset(filenames_scm[3])\n"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "3a2f99be",
-   "metadata": {},
-   "source": [
-    "## Open other dataset\n",
-    "\n"
-   ]
-  },
-  {
-   "cell_type": "raw",
-   "id": "dc6e3b90",
-   "metadata": {},
-   "source": [
-    "#--- open SCM file\n",
-    "datapath = \"~/Desktop/CGILS_forcing\"\n",
-    "filename_cgils = \"ctl_s12.nc\"\n",
-    "file_cgils = datapath+\"/\"+filename_cgils\n",
-    "\n",
-    "da_cgils = xr.open_dataset(file_cgils)\n",
-    "da_cgils"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "9311452d",
-   "metadata": {},
-   "source": [
-    "## Plot XY profiles"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "8012006d",
-   "metadata": {},
-   "source": [
-    "### set shared plot features"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "03ac7835-46ac-4665-851c-b26c65b1244f",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "#--- set shared feature\n",
-    "\n",
-    "def ax_def_xy (ax, var):\n",
-    "\n",
-    "    #--- set grids\n",
-    "    ax.grid(True)\n",
-    "    ax.minorticks_on()\n",
-    "    \n",
-    "    #--- inverse axes\n",
-    "    ax.invert_yaxis()\n",
-    "    \n",
-    "    #--- legend\n",
-    "    ax.legend([\"SCM\"])\n",
-    "    \n",
-    "    #--- set x or y labels\n",
-    "    ax.set_ylabel(\"Pressure (hPa)\")\n",
-    "\n",
-    "    #--- set X and Y axis range  \n",
-    "    #ax.set_xlim([xmin, xmax])\n",
-    "    #ax.set_ylim([1020., 500.])\n",
-    "    \n",
-    "    #--- set title\n",
-    "    ax.set_title(var.attrs['long_name'], loc='left')\n",
-    "    ax.set_title(var.attrs['units'], loc='right')\n",
-    "    ax.set_xlabel(var.attrs['long_name']+\" (\"+var.attrs['units']+\")\")"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "32961ea5",
-   "metadata": {},
-   "source": [
-    "### Plot 1 - "
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "075ff405-e4cc-4b6b-a75b-f6fed39e3758",
-   "metadata": {},
-   "outputs": [],
-   "source": [
-    "tt = 0   # time step\n",
-    "\n",
-    "fig, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(18, 6))\n",
-    "fig.suptitle(\"SCM, time step=\"+str(tt))\n",
-    "fig.tight_layout()\n",
-    "\n",
-    "#--- line style\n",
-    "style_1a = 'r-'; style_1b = 'r--'; style_1c = 'r:'\n",
-    "style_2a = 'b-'; style_2b = 'b--'; style_2c = 'b:'\n",
-    "style_3a = 'y-'; style_3b = 'y--'; style_3c = 'y:'\n",
-    "style_4a = 'c-'; style_4b = 'c--'; style_4c = 'c:'\n",
-    "\n",
-    "#--- subplot 1\n",
-    "ax1.plot(\n",
-    "    da_set1.omega[tt,:,0,0]*864., da_set1.pfull_tv[tt,:,0,0]/100., style_1,\n",
-    "    da_set2.omega[tt,:,0,0]*864., da_set2.pfull_tv[tt,:,0,0]/100., style_2,\n",
-    "    #da_merraCG_FT0.omega[tt,:,0,0], da_merraCG_FT0.pfull_tv[tt,:,0,0]/100., style_3,\n",
-    "        )\n",
-    "var_dum = da_set1.omega.copy()\n",
-    "var_dum.attrs['units']=\"hPa/day\"\n",
-    "ax_def_xy(ax1, var_dum)\n",
-    "ax1.legend([\"SCM\",\"MERRA2\"])\n",
-    "\n",
-    "\n",
-    "#--- subplot 2\n",
-    "ax2.plot(\n",
-    "    da_set1.temp[tt,:,0,0], da_set1.pfull_tv[tt,:,0,0]/100., style_1,\n",
-    "    #da_set2.temp[tt,:,0,0], da_set2.pfull_tv[tt,:,0,0]/100., style_2,\n",
-    "    #da_merraCG_FT0.temp[tt,:,0,0], da_merraCG_FT0.pfull_tv[tt,:,0,0]/100., style_3,\n",
-    "        )\n",
-    "ax_def_xy(ax2, da_set1.temp[tt,:,0,0])\n",
-    "\n",
-    "#--- subplot 3\n",
-    "ax3.plot(\n",
-    "    da_set1.sphum[tt,:,0,0]*1000., da_set1.pfull_tv[tt,:,0,0]/100., style_1,\n",
-    "    #da_set2.temp[tt,:,0,0], da_set2.pfull_tv[tt,:,0,0]/100., style_2,\n",
-    "    #da_merraCG_FT0.temp[tt,:,0,0], da_merraCG_FT0.pfull_tv[tt,:,0,0]/100., style_3,\n",
-    "        )\n",
-    "var_dum = da_set1.sphum.copy()\n",
-    "var_dum.attrs['units']=\"g/kg\"\n",
-    "ax_def_xy(ax3, var_dum)\n"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "c4c32392",
-   "metadata": {},
-   "source": [
-    "### Plot 2 - "
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": null,
-   "id": "0e72a861",
-   "metadata": {},
-   "outputs": [],
-   "source": []
-  }
- ],
- "metadata": {
-  "kernelspec": {
-   "display_name": "Python 3",
-   "language": "python",
-   "name": "python3"
-  },
-  "language_info": {
-   "codemirror_mode": {
-    "name": "ipython",
-    "version": 3
-   },
-   "file_extension": ".py",
-   "mimetype": "text/x-python",
-   "name": "python",
-   "nbconvert_exporter": "python",
-   "pygments_lexer": "ipython3",
-   "version": "3.8.8"
-  }
- },
- "nbformat": 4,
- "nbformat_minor": 5
-}
-EOF
-#*** case: plot-scm-xy end ***
 
 #*** case: "MERRA2_interp2scm" start ***
 elif [ $casename_work -a $casename_work == "MERRA2_interp2scm" ]; then
@@ -2048,6 +1801,583 @@ cat >> $py_name << EOF || exit 1
 }
 EOF
 #*** case: MERRA2_interp2scm end ***
+
+#*** case: "plot-scm-xy_profile" start ***
+elif [ $casename_work -a $casename_work == "plot-scm-xy_profile" ]; then
+
+cat >> $py_name << EOF || exit 1
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "b3707dae",
+   "metadata": {},
+   "source": [
+    "# Program - plot XY profiles in SCM\n",
+    "\n",
+    "**Content:**\n",
+    "\n",
+    "- Open and Read a SCM netCDF file\n",
+    "- Open and Read other dataset\n",
+    "- Plot XY profile\n",
+    "\n",
+    "**Author**: Yi-Hsuan Chen (yihsuan@umich.edu)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "1bb2aed2",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import matplotlib.pyplot as plt\n",
+    "import numpy as np\n",
+    "import xarray as xr\n",
+    "import io, os, sys, types\n",
+    "\n",
+    "import yhc_module as yhc\n",
+    "\n",
+    "xr.set_options(keep_attrs=True)  # keep attributes after xarray operation"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c98ba131",
+   "metadata": {},
+   "source": [
+    "## Open SCM file\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b227e675",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#--- open SCM file\n",
+    "datapath = \"../data.scm.edmf_mynn/\"\n",
+    "\n",
+    "#--- single file\n",
+    "#filename_scm = \"\"\n",
+    "#file_scm = datapath+\"/\"+filename_scm\n",
+    "\n",
+    "#--- multiple files\n",
+    "filenames_scm = [\n",
+    "             \"SCM_am4_xanadu_edmf_mynn.v01_RF01-00cd-am4p0_aerT_clr_am4RAD_sw.1x0m5d_1x1a.atmos_edmf_mynn.nc\", \n",
+    "             \"SCM_am4_xanadu_edmf_mynn.v01_RF01-00cd-am4p0_aerT_clr_am4RAD_sw_FMRA.1x0m5d_1x1a.atmos_edmf_mynn.nc\", \n",
+    "             \"SCM_am4_xanadu_edmf_mynn.v01_RF01-00cd-am4p0_aerT_clr_am4RAD_sw_FMRACg_FT0.1x0m5d_1x1a.atmos_edmf_mynn.nc\", \n",
+    "             \"SCM_am4_xanadu_edmf_mynn.v01_RF01-00cd-am4p0_aerT_clr_am4RAD_sw_FMRACg_FTMRA.1x0m5d_1x1a.atmos_edmf_mynn.nc\"\n",
+    "                ]\n",
+    "filenames_scm = [datapath+file1 for file1 in filenames_scm]\n",
+    "\n",
+    "#--- open data using xarray\n",
+    "da_set1 = xr.open_dataset(filenames_scm[0])\n",
+    "da_set2 = xr.open_dataset(filenames_scm[1])\n",
+    "da_set3 = xr.open_dataset(filenames_scm[2])\n",
+    "da_set4 = xr.open_dataset(filenames_scm[3])\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3a2f99be",
+   "metadata": {},
+   "source": [
+    "## Open other dataset\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "dc6e3b90",
+   "metadata": {},
+   "source": [
+    "#--- open SCM file\n",
+    "datapath = \"~/Desktop/CGILS_forcing\"\n",
+    "filename_cgils = \"ctl_s12.nc\"\n",
+    "file_cgils = datapath+\"/\"+filename_cgils\n",
+    "\n",
+    "da_cgils = xr.open_dataset(file_cgils)\n",
+    "da_cgils"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9311452d",
+   "metadata": {},
+   "source": [
+    "## Plot XY profiles"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8012006d",
+   "metadata": {},
+   "source": [
+    "### set shared plot features"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "03ac7835-46ac-4665-851c-b26c65b1244f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#--- set shared feature\n",
+    "def ax_def_xy (ax, var):\n",
+    "\n",
+    "    #--- set grids\n",
+    "    ax.grid(True)\n",
+    "    ax.minorticks_on()\n",
+    "    \n",
+    "    #--- inverse axes\n",
+    "    ax.invert_yaxis()\n",
+    "    \n",
+    "    #--- legend\n",
+    "    #ax.legend([\"SCM\"])\n",
+    "    \n",
+    "    #--- set x or y labels\n",
+    "    ax.set_ylabel(\"Pressure (hPa)\")\n",
+    "\n",
+    "    #--- set X and Y axis range  \n",
+    "    #ax.set_xlim([xmin, xmax])\n",
+    "    #ax.set_ylim([1020., 500.])\n",
+    "    \n",
+    "    #--- set title\n",
+    "    ax.set_title(var.attrs['long_name'], loc='left')\n",
+    "    ax.set_title(var.attrs['units'], loc='right')\n",
+    "    ax.set_xlabel(var.attrs['long_name']+\" (\"+var.attrs['units']+\")\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "32961ea5",
+   "metadata": {},
+   "source": [
+    "### Plot 1 - "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "075ff405-e4cc-4b6b-a75b-f6fed39e3758",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "tt = 0   # time step\n",
+    "\n",
+    "fig, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(18, 6))\n",
+    "fig.suptitle(\"SCM, time step=\"+str(tt), fontsize = 20)\n",
+    "fig.tight_layout()\n",
+    "\n",
+    "#--- line style\n",
+    "style_r1 = 'r-'; style_r2 = 'r--'; style_r3 = 'r:'\n",
+    "style_b1 = 'b-'; style_b2 = 'b--'; style_b3 = 'b:'\n",
+    "style_y1 = 'y-'; style_y2 = 'y--'; style_y3 = 'y:'\n",
+    "style_c1 = 'c-'; style_c2 = 'c--'; style_c2 = 'c:'\n",
+    "\n",
+    "#--- subplot 1\n",
+    "varname1 = \"omega\"\n",
+    "factor1 = 864.\n",
+    "\n",
+    "ax1.plot(\n",
+    "    da_set1.get(varname1)[tt,:,0,0]*factor1, da_set1.pfull_tv[tt,:,0,0]/100., style_r1,\n",
+    "    da_set2.get(varname1)[tt,:,0,0]*factor1, da_set2.pfull_tv[tt,:,0,0]/100., style_b1,\n",
+    "        )\n",
+    "\n",
+    "legend_1 = [\"\",\n",
+    "            \"\",\n",
+    "           ]\n",
+    "\n",
+    "var_dum1 = da_set1.get(varname1).copy()\n",
+    "var_dum1.attrs['units']=\"hPa/day\"\n",
+    "ax_def_xy(ax1, var_dum1)\n",
+    "ax1.legend(legend_1)\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c4c32392",
+   "metadata": {},
+   "source": [
+    "### Plot 2 - "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "0e72a861",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.13"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
+EOF
+#*** case: plot-scm-xy_profile end ***
+
+#*** case: "plot-scm-xy_series" start ***
+elif [ $casename_work -a $casename_work == "plot-scm-xy_series" ]; then
+
+cat >> $py_name << EOF || exit 1
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "b3707dae",
+   "metadata": {},
+   "source": [
+    "# Program - plot XY series in SCM\n",
+    "\n",
+    "**Content:**\n",
+    "\n",
+    "- Open and Read a SCM netCDF file\n",
+    "- Open and Read other dataset\n",
+    "- Plot XY time series\n",
+    "\n",
+    "**Author**: Yi-Hsuan Chen (yihsuan@umich.edu)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "1bb2aed2",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import matplotlib.pyplot as plt\n",
+    "import numpy as np\n",
+    "import xarray as xr\n",
+    "import io, os, sys, types\n",
+    "import yhc_module as yhc\n",
+    "\n",
+    "xr.set_options(keep_attrs=True)  # keep attributes after xarray operation"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c98ba131",
+   "metadata": {},
+   "source": [
+    "## Open SCM file\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b227e675",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#--- open SCM file\n",
+    "datapath = \"../data.scm.edmf_mynn/\"\n",
+    "\n",
+    "#--- single file\n",
+    "#filename_scm = \"\"\n",
+    "#file_scm = datapath+\"/\"+filename_scm\n",
+    "\n",
+    "#--- multiple files\n",
+    "filenames_scm = [\n",
+    "             \"SCM_am4_xanadu_edmf_mynn.v01_RF01-00cd-am4p0_aerT_clr_am4RAD_sw.1x0m5d_1x1a.atmos_edmf_mynn.nc\", \n",
+    "             \"SCM_am4_xanadu_edmf_mynn.v01_RF01-00cd-am4p0_aerT_clr_am4RAD_sw_FMRA.1x0m5d_1x1a.atmos_edmf_mynn.nc\", \n",
+    "             \"SCM_am4_xanadu_edmf_mynn.v01_RF01-00cd-am4p0_aerT_clr_am4RAD_sw_FMRACg_FT0.1x0m5d_1x1a.atmos_edmf_mynn.nc\", \n",
+    "             \"SCM_am4_xanadu_edmf_mynn.v01_RF01-00cd-am4p0_aerT_clr_am4RAD_sw_FMRACg_FTMRA.1x0m5d_1x1a.atmos_edmf_mynn.nc\"\n",
+    "                ]\n",
+    "filenames_scm = [datapath+file1 for file1 in filenames_scm]\n",
+    "\n",
+    "#--- open data using xarray\n",
+    "da_set1 = xr.open_dataset(filenames_scm[0])\n",
+    "da_set2 = xr.open_dataset(filenames_scm[1])\n",
+    "da_set3 = xr.open_dataset(filenames_scm[2])\n",
+    "da_set4 = xr.open_dataset(filenames_scm[3])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3a2f99be",
+   "metadata": {},
+   "source": [
+    "## Open other dataset"
+   ]
+  },
+  {
+   "cell_type": "raw",
+   "id": "c3ea51f4-be16-4f94-86db-0782f19aea8d",
+   "metadata": {},
+   "source": [
+    "datapath = \"../data.scm.edmf_mynn/\"\n",
+    "filename_les_ps = datapath+\"/\"+\"stats.ps.dycoms.A3long.nc\"\n",
+    "filename_les_cf = datapath+\"/\"+\"dycoms.A3long.cf.nc\"\n",
+    "\n",
+    "da_les_ps = xr.open_dataset(filename_les_ps)\n",
+    "da_les_cf = xr.open_dataset(filename_les_cf)\n",
+    "\n",
+    "da_les_ps"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "face8e4f-2c56-48df-8f75-ca624e06de85",
+   "metadata": {},
+   "source": [
+    "## Set time coordinate"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "f3578c86-f773-433e-84e3-9ed005e4d468",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#--- set time coordinate\n",
+    "time_coord = \"hour\"\n",
+    "\n",
+    "if (time_coord == \"hour\"):\n",
+    "    ntime = len(da_set1.time)\n",
+    "    tt = np.linspace(0., (ntime-1)/2., ntime)   # SCM time step is 30 minutes\n",
+    "    \n",
+    "else:\n",
+    "    err_msg = f\"ERROR: time coord [{time_coord}] is not supported\"\n",
+    "    raise ValueError(err_msg)\n",
+    "\n",
+    "#print(tt)\n",
+    "#print(tt.min())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9311452d",
+   "metadata": {},
+   "source": [
+    "## Plot XY series"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3151eb61-920d-44be-a04b-c4765f22d303",
+   "metadata": {},
+   "source": [
+    "### Set shared features"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ebf53bed-d511-45af-927d-f8e0436166b0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#--- set shared feature\n",
+    "\n",
+    "def ax_def_xy (ax, var):\n",
+    "    #--- set grids\n",
+    "    ax.grid(True)\n",
+    "    #ax.grid(which='major', color='gray', linewidth=0.7)\n",
+    "    #ax.grid(which='minor', color='gray', linewidth=0.7)\n",
+    "    #ax.xaxis.grid(which=\"minor\", color='gray', linestyle='-.', linewidth=0.7)\n",
+    "    #ax.xaxis.grid(which=\"major\", color='gray', linestyle='-.', linewidth=0.7)\n",
+    "    ax.minorticks_on()\n",
+    "    \n",
+    "    #--- legend\n",
+    "    #ax.legend([\"SCM\"])\n",
+    "    \n",
+    "    #--- set x or y labels\n",
+    "    ax.set_xlabel(\"Time (\"+time_coord+\")\")\n",
+    "\n",
+    "    #--- set title\n",
+    "    ax.set_title(var.attrs['long_name'], loc='left')\n",
+    "    ax.set_title(var.attrs['units'], loc='right')\n",
+    "    ax.set_ylabel(var.attrs['long_name']+\" (\"+var.attrs['units']+\")\")\n",
+    "    \n",
+    "    #--- set x range\n",
+    "    ax.set_xlim([tt.min(),tt.max()])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "6ffea177-165a-4e03-a736-289dc27884d0",
+   "metadata": {},
+   "source": [
+    "### Plot 1 - "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "3ef47b2f-b739-4e26-b5d5-5c12c00516aa",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "fig, (ax1, ax2, ax3) = plt.subplots(3,1, figsize=(18, 12))\n",
+    "fig.suptitle(\"SCM, time series\", fontsize = 20)\n",
+    "fig.tight_layout()\n",
+    "\n",
+    "#--- line style\n",
+    "style_r1 = 'r-'; style_r2 = 'r--'; style_r3 = 'r:'\n",
+    "style_b1 = 'b-'; style_b2 = 'b--'; style_b3 = 'b:'\n",
+    "style_y1 = 'y-'; style_y2 = 'y--'; style_y3 = 'y:'\n",
+    "style_c1 = 'c-'; style_c2 = 'c--'; style_c2 = 'c:'\n",
+    "\n",
+    "#--- subplot 1\n",
+    "#varname1 = \"z_pbl\"\n",
+    "varname1 = \"LWP\"\n",
+    "factor = 1000.\n",
+    "\n",
+    "ax1.plot(    \n",
+    "    tt, da_set1.get(varname1)[:,0,0]*factor, style_r1, \n",
+    "    tt, da_set2.get(varname1)[:,0,0]*factor, style_b1,\n",
+    "        )\n",
+    "\n",
+    "legend_1 = [\"set1\",\n",
+    "            \"set2\",\n",
+    "           ]\n",
+    "\n",
+    "var_dum = da_set1.get(varname1).copy()\n",
+    "var_dum.attrs['units']=\"g/m2\"\n",
+    "ax_def_xy(ax1, var_dum)\n",
+    "ax1.legend(legend_0)\n",
+    "\n",
+    "#--- subplot 2\n",
+    "#varname1 = \"z_pbl\"\n",
+    "varname2a = \"swup_toa_clr\"\n",
+    "varname2b = \"swup_toa\"\n",
+    "\n",
+    "ax2.plot(    \n",
+    "    tt, da_set1.get(varname2a)[:,0,0]-da_set1.get(varname2b)[:,0,0], style_r1, \n",
+    "    tt, da_set2.get(varname2a)[:,0,0]-da_set2.get(varname2b)[:,0,0], style_b1, \n",
+    "        )\n",
+    "\n",
+    "var_dum2 = da_set1.get(varname2a).copy()\n",
+    "var_dum2.attrs['long_name']=\"SWCRE\"\n",
+    "ax_def_xy(ax2, var_dum2)\n",
+    "ax2.legend(legend_1)\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "5a799ec4-eb8d-4e92-ac5b-24b03a0b1b41",
+   "metadata": {},
+   "source": [
+    "## Do some statistics"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "efadc4b4",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#--- set time range\n",
+    "time_range = \"02_06h\"\n",
+    "#time_range = \"24_72h\"\n",
+    "\n",
+    "dim = \"time\"\n",
+    "opt = \"avg\"\n",
+    "\n",
+    "if (time_range == \"02_06h\"):\n",
+    "    tt1 = 4\n",
+    "    tt2 = 12\n",
+    "    \n",
+    "elif (time_range == \"24_72h\"):\n",
+    "    tt1 = 48\n",
+    "    tt2 = 144\n",
+    "\n",
+    "else:\n",
+    "    raise ValueError(\"no support\")\n",
+    "\n",
+    "#--- var\n",
+    "varname1 = \"LWP\"\n",
+    "factor = 1000.\n",
+    "avg_var1 = yhc.var_stats(\n",
+    "    da_set1.get(varname1)[tt1:tt2,0,0]*factor, \n",
+    "    da_set2.get(varname1)[tt1:tt2,0,0]*factor, \n",
+    "    dim = dim, opt = opt\n",
+    "        )\n",
+    "\n",
+    "print(varname1+\" , \"+time_range)\n",
+    "print(avg_var1)\n",
+    "\n",
+    "#--- SWCRE\n",
+    "varname2 = \"SWCRE\"\n",
+    "avg_var2 = yhc.var_stats(\n",
+    "    da_set1.get(varname2a)[tt1:tt2,0,0]-da_set1.get(varname2b)[tt1:tt2,0,0],\n",
+    "    da_set2.get(varname2a)[tt1:tt2,0,0]-da_set2.get(varname2b)[tt1:tt2,0,0],\n",
+    "    dim = dim, opt = opt\n",
+    "        )\n",
+    "\n",
+    "print(varname2+\" , \"+time_range)\n",
+    "print(avg_var2)\n",
+    "\n",
+    "print('')\n",
+    "print(legend_1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "2d7a2ae2",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "a4200008",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.13"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
+EOF
+#*** case: plot-scm-xy_series end ***
 
 # newcase
 
