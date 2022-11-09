@@ -27,6 +27,7 @@ cases=(
       "plot-scm-xy_profile"
       "plot-scm-xy_series"
       "test_case1"
+      "tmplate"
       ) 
        #newcase
 
@@ -35,6 +36,7 @@ cases_notes=(
       "plot-scm-xy_profile	: read SCM files and plot XY profiles"
       "plot-scm-xy_series	: read SCM files and plot XY time series"
       "test_case1 		: a test case"
+      "tmplate                  : a template for ipynb program"
             )
 
 #usage="(-c OR -case ${cases[@]}) (-d OR -dir dir1) (-f OR -file file1) (-h OR -help) (-a OR -add file1.sh case_name) (-func) ooo.sh"
@@ -2378,6 +2380,183 @@ cat >> $py_name << EOF || exit 1
 }
 EOF
 #*** case: plot-scm-xy_series end ***
+
+#*** case: "tmplate" start ***
+elif [ $casename_work -a $casename_work == "tmplate" ]; then
+
+cat >> $py_name << EOF || exit 1
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "323157ca",
+   "metadata": {},
+   "source": [
+    "# Program - \n",
+    "\n",
+    "**Purpose**\n",
+    "\n",
+    "\n",
+    "**Content**\n",
+    "- read data\n",
+    "- plot XY profiles\n",
+    "\n",
+    "**Author:** Yi-Hsuan Chen (yihsuan@umich.edu)\n",
+    "\n",
+    "**Date:** \n",
+    "\n",
+    "**Reference program:**\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "2ebadecb",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<xarray.core.options.set_options at 0x7fbe3a0eedf0>"
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "import cartopy.crs as ccrs\n",
+    "import cartopy.feature as cfeature\n",
+    "import matplotlib.pyplot as plt\n",
+    "import numpy as np\n",
+    "import xarray as xr\n",
+    "import io, os, sys, types\n",
+    "\n",
+    "import yhc_module as yhc\n",
+    "\n",
+    "xr.set_options(keep_attrs=True)  # keep attributes after xarray operation"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "01716b6a",
+   "metadata": {},
+   "source": [
+    "## Read data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "id": "f3cd35c9",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#--- datapath\n",
+    "datapath_1 = \"d\"\n",
+    "\n",
+    "#--- file names\n",
+    "fname_a = \"a\"\n",
+    "fname_b = \"a\"\n",
+    "fname_c = datapath_1+\"/\"+\"dd\"\n",
+    "\n",
+    "fnames_1 = [\n",
+    "         fname_a, \n",
+    "         fname_b,\n",
+    "         ]\n",
+    "fnames_1 = [datapath_1+\"/\"+file1 for file1 in fnames_1]\n",
+    "\n",
+    "#print(fnames_1)\n",
+    "\n",
+    "#--- read data using Xarray\n",
+    "#da_a = xr.open_dataset(fnames_1[0])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "483a757e",
+   "metadata": {},
+   "source": [
+    "## Data processing"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "6b2838c1",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "id": "87f9d396",
+   "metadata": {},
+   "source": [
+    "## Plot - "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "c9dfcf75",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "af714b0d",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "id": "054503e8",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#yhc.lib(\"fdef\")   # check out yhc library"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "265eb1b8",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.8"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
+EOF
+#*** case: tmplate end ***
 
 # newcase
 
