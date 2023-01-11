@@ -26,6 +26,7 @@ cases=(
       "MERRA2_interp2scm"
       "plot-scm-xy_profile"
       "plot-scm-xy_series"
+      "read_data"
       "test_case1"
       "tmplate"
       ) 
@@ -33,6 +34,7 @@ cases=(
 
 cases_notes=(
       "MERRA2_interp2scm	: interpolate MERRA-2 data on GFDL SCM levels"
+      "read_data                : read various datasets"
       "plot-scm-xy_profile	: read SCM files and plot XY profiles"
       "plot-scm-xy_series	: read SCM files and plot XY time series"
       "test_case1 		: a test case"
@@ -2557,6 +2559,252 @@ cat >> $py_name << EOF || exit 1
 }
 EOF
 #*** case: tmplate end ***
+
+#*** case: "read_data" start ***
+elif [ $casename_work -a $casename_work == "read_data" ]; then
+
+cat >> $py_name << EOF || exit 1
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "323157ca",
+   "metadata": {},
+   "source": [
+    "# Program - Read and Return different datasets\n",
+    "\n",
+    "**Purpose**\n",
+    "\n",
+    "\n",
+    "**Content**\n",
+    "- read different dataset (model, reanalysis, etc.) and return Xarray Dataset\n",
+    "\n",
+    "**Author:** Yi-Hsuan Chen (yihsuan@umich.edu)\n",
+    "\n",
+    "**Date:** \n",
+    "\n",
+    "**Reference program:**\n",
+    "\n",
+    "**Convert ipynb to py:**\n",
+    "\n",
+    "jupyter nbconvert read_data.ipynb --to python\n",
+    "\n",
+    "**import:**\n",
+    "\n",
+    "import read_data as read_data\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "2ebadecb",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import cartopy.crs as ccrs\n",
+    "import cartopy.feature as cfeature\n",
+    "import matplotlib.pyplot as plt\n",
+    "import numpy as np\n",
+    "import xarray as xr\n",
+    "import io, os, sys, types\n",
+    "\n",
+    "import yhc_module as yhc\n",
+    "\n",
+    "xr.set_options(keep_attrs=True)  # keep attributes after xarray operation"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "01716b6a",
+   "metadata": {},
+   "source": [
+    "## Read SCM data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ce86a23a-a002-4a8c-befc-77166a3bc8c8",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def read_scm_data(choice): \n",
+    "    \n",
+    "    \"\"\"\n",
+    "    ----------------------\n",
+    "    Description:\n",
+    "\n",
+    "\n",
+    "    Input arguments:\n",
+    "\n",
+    "\n",
+    "    Return:\n",
+    "\n",
+    "\n",
+    "    Example:\n",
+    "      import yhc_module as yhc\n",
+    "       = yhc.()\n",
+    "\n",
+    "    Date created: 2022-12-02\n",
+    "    ----------------------\n",
+    "    \"\"\"\n",
+    "\n",
+    "    func_name = \"read_scm_data\"\n",
+    "\n",
+    "    #--- scm_rf01_am4rad\n",
+    "    if (choice == \"scm_rf01_am4rad\"):\n",
+    "        datapath = \"/work/Yi-hsuan.Chen/research/edmf_CM4/data_plot.SCM/data.scm.edmf_mynn.RF01/\"\n",
+    "\n",
+    "        fnames_rf01_am4rad = [\n",
+    "          \"SCM_am4_xanadu_edmf_mynn.v01_RF01-00ce-am4p0_aerT_am4RAD_sw_cloudy.1x0m5d_1x1a.atmos_edmf_mynn.nc\",\n",
+    "          \"SCM_am4_xanadu_edmf_mynn.v01_RF01-00ce-am4p0_aerT_am4RAD_sw_cloudy_CGhadv.1x0m5d_1x1a.atmos_edmf_mynn.nc\",\n",
+    "          \"SCM_am4_xanadu_edmf_mynn.v01_RF01-00ce-am4p0_aerT_am4RAD_sw_ICAM4n_FAM4n.1x0m5d_1x1a.atmos_edmf_mynn.nc\",\n",
+    "          \"SCM_am4_xanadu_edmf_mynn.v01_RF01-00ce-am4p0_aerT_am4RAD_sw_ICMRA_FMRA.1x0m5d_1x1a.atmos_edmf_mynn.nc\",\n",
+    "                             ]\n",
+    "        \n",
+    "        fnames_scm_rf01 = [datapath+file1 for file1 in fnames_rf01_am4rad]\n",
+    "\n",
+    "        da_rf01_am4rad_stv = xr.open_dataset(fnames_scm_rf01[0])\n",
+    "        da_rf01_am4rad_CGhadv = xr.open_dataset(fnames_scm_rf01[1])\n",
+    "        da_rf01_am4rad_pfAM4n = xr.open_dataset(fnames_scm_rf01[2])\n",
+    "        da_rf01_am4rad_pfMRA = xr.open_dataset(fnames_scm_rf01[3])\n",
+    "    \n",
+    "        return da_rf01_am4rad_stv, da_rf01_am4rad_CGhadv, da_rf01_am4rad_pfAM4n, da_rf01_am4rad_pfMRA\n",
+    "\n",
+    "    else:\n",
+    "        error_msg = f\"ERROR: function [{func_name}] does not support [{choice}].\"\n",
+    "        raise ValueError(error_msg)\n",
+    "        \n",
+    "#-----------\n",
+    "# do_test\n",
+    "#-----------\n",
+    "\n",
+    "do_test=True\n",
+    "#do_test=False\n",
+    "\n",
+    "if (do_test):\n",
+    "    \n",
+    "    choice = \"SCM_RF01_00cf_scmRAD\"\n",
+    "    da_rf01_scmRAD_ICStv_FStv, da_rf01_scmRAD_ICStv_2Xdiv, \\\n",
+    "               da_rf01_scmRAD_ICStv_CGhadv, da_rf01_scmRAD_ICStv_FAM4n, \\\n",
+    "               da_rf01_scmRAD_ICStv_FMRA, \\\n",
+    "               da_rf01_scmRAD_ICStv_L07div, da_rf01_scmRAD_ICStv_L07div_CGhadv = read_scm_data(choice)\n",
+    "    #print(da_rf01_scmRAD_ICStv_L07div)\n",
+    "    \n",
+    "    choice = \"SCM_RF01_00cf_am4RAD\"\n",
+    "    da_rf01_am4RAD_ICStv_FStv, da_rf01_am4RAD_ICStv_2Xdiv,  \\\n",
+    "               da_rf01_am4RAD_ICStv_CGhadv, da_rf01_am4RAD_ICStv_FAM4n, \\\n",
+    "               da_rf01_am4RAD_ICStv_FMRA, da_rf01_am4RAD_ICAM4n_FAM4n, \\\n",
+    "               da_rf01_am4RAD_ICMRA_FMRA, \\\n",
+    "               da_rf01_am4RAD_ICStv_L07div, da_rf01_am4RAD_ICStv_L07div_CGhadv = read_scm_data(choice)\n",
+    "    print(da_rf01_am4RAD_ICStv_L07div)\n",
+    "    \n",
+    "    #print(da_rf01_scmRAD_ICStv_FStv)\n",
+    "    \n",
+    "    #print(da_rf01_am4rad_stv)\n",
+    "    #print(da_rf02_am4rad_stv)\n",
+    "\n",
+    "#da_rf02_scmrad_stv"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "91f12613-5de0-4682-ad58-c2d6d1cfcc66",
+   "metadata": {},
+   "source": [
+    "## Read MERRA-2 data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "c14348a8-5f33-4562-b4a7-01358037cf7e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def read_merra2_data(choice): \n",
+    "\n",
+    "    func_name = \"read_merra2_data\"\n",
+    "\n",
+    "#=================================\n",
+    "# get data path and file names\n",
+    "#=================================\n",
+    "    \n",
+    "    #--- tdt_July10_12\n",
+    "    if (choice == \"tdt_July10_12\"):\n",
+    "        datapath = \"/work/Yi-hsuan.Chen/research/edmf_CM4/data_plot.AM4/data.MERRA-2.tavg3_3d_tdt_Np.200107/\"\n",
+    "        \n",
+    "        fnames = [\"MERRA2_300.tavg3_3d_tdt_Np.20010710.SUB.nc\",\n",
+    "                  \"MERRA2_300.tavg3_3d_tdt_Np.20010711.SUB.nc\",\n",
+    "                  \"MERRA2_300.tavg3_3d_tdt_Np.20010712.SUB.nc\"]\n",
+    "        #fnames = [datapath+fname1 for fname1 in fnames]\n",
+    "        #da_merra2_tdt = xr.open_mfdataset(fnames)\n",
+    "        #return da_merra2_tdt\n",
+    "    \n",
+    "    else:\n",
+    "        error_msg = f\"ERROR: function [{func_name}] does not support [{choice}].\"\n",
+    "        raise ValueError(error_msg)\n",
+    "\n",
+    "#=================================\n",
+    "# read data\n",
+    "#=================================\n",
+    "    fnames = [datapath+fname1 for fname1 in fnames]\n",
+    "    \n",
+    "    da_merra2 = xr.open_mfdataset(fnames)\n",
+    "    \n",
+    "    return da_merra2\n",
+    "    \n",
+    "#-----------\n",
+    "# do_test\n",
+    "#-----------\n",
+    "\n",
+    "do_test=True\n",
+    "#do_test=False\n",
+    "\n",
+    "if (do_test):\n",
+    "    choice = \"tdt_July10_12\"\n",
+    "    #choice = \"qdt_July10_12\"\n",
+    "    #choice = \"state_July10_12\"\n",
+    "    choice = \"uvdiv_July10_12\"\n",
+    "    \n",
+    "    da1 = read_merra2_data(choice)\n",
+    "    \n",
+    "    #print(da1)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "03f7d011-fe8f-4a3b-9601-24ca935fad72",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.8"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
+EOF
+#*** case: read_data end ***
 
 # newcase
 
